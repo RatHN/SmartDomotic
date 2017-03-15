@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SmartDomotic</string>
+
+    <!--Menú principal y Activar Bluetooth-->
+    <string name="SC">SELECCIONE CUARTO</string>
+    <string name="BT">Conectar dispositivos</string>
+
+    <!--Habitaciones-->
+    <string name="D1">DORMITORIO 1</string>
+    <string name="D2">DORMITORIO 2</string>
+    <string name="BA">BAÑO</string>
+    <string name="SA">SALA</string>
+
+    <!--Complemento-->
+    <string name="LCO">LUZ CORREDOR</string>
+    <string name="Pu">PUERTA</string>
+
+    <!--Aparatos electrónicos-->
+    <string name="luz">Luz</string>
+    <string name="ven">Ventilador</string>
+    <string name="tco">Toma corriente</string>
+    <string name="tv">TV</string>
+    <string name="pi">Piano</string>
+
+</resources>
