@@ -21,10 +21,10 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class AdministradorDeBluetooth {
+    public static final String DEVICE_ADDRESS_KEY = "DEVICE_ADDRESS";
     private static final int MESSAGE_READ = 10;
     private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final String TAG = "smartdomotic";
-    private final String DEVICE_ADDRESS_KEY = "DEVICE_ADDRESS";
     private Context mContext;
     private Handler mHandler;
     private BluetoothDevice mDevice;

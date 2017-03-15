@@ -1,10 +1,9 @@
 package pruebas.app.wilfredorivera.com.smartdomotic;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Switch;
 
-public class Bano extends AppCompatActivity {
+public class Bano extends SmartDomoticActivity {
 
     Switch lb, tcb;
 
@@ -17,5 +16,10 @@ public class Bano extends AppCompatActivity {
 
         // lb.setOnClickListener(this);
         // tcb.setOnClickListener(this);
+    }
+
+    @Override
+    void mensajeRecibido(byte[] buffer, int bytes) {
+
     }
 }

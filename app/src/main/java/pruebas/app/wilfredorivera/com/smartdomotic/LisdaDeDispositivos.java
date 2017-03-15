@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
+import static pruebas.app.wilfredorivera.com.smartdomotic.AdministradorDeBluetooth.DEVICE_ADDRESS_KEY;
+
 
 public class LisdaDeDispositivos extends ListActivity {
     static String Direccion_MAC = null;
@@ -63,8 +65,8 @@ public class LisdaDeDispositivos extends ListActivity {
         new ConnectThread(dispocitivosconectados.get(position), position).run();
     }
 
-    private void guardarDispositivoBluetooth(int index) {
-        pref.edit().putInt("DEVICE", index).apply();
+    private void guardarDispositivoBluetooth(String index) {
+        pref.edit().putString(DEVICE_ADDRESS_KEY, index).apply();
     }
 
     private class ConnectThread extends Thread {
@@ -108,7 +110,7 @@ public class LisdaDeDispositivos extends ListActivity {
 
             // The connection attempt succeeded. Perform work associated with
             // the connection in a separate thread.
-            guardarDispositivoBluetooth(index);
+            guardarDispositivoBluetooth(mmDevice.getAddress());
         }
 
         // Closes the client socket and causes the thread to finish.
