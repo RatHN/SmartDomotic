@@ -112,7 +112,8 @@ public class MainActivity extends SmartDomoticActivity {
             }
         });
 
-        IntentFilter mStatusIntentFilter = new IntentFilter(ESTADO_CAMBIO);
+        IntentFilter mStatusIntentFilter = new IntentFilter(ESTADO_BLUETOOTH_ACTIVO);
+        mStatusIntentFilter.addAction(ESTADO_BLUETOOTH_INACTIVO);
         BluetoothBradcastReceiver broadcastReceiver = new BluetoothBradcastReceiver();
 
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, mStatusIntentFilter);

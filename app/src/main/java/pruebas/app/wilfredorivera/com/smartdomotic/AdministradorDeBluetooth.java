@@ -44,6 +44,7 @@ public class AdministradorDeBluetooth {
         mPref = context.getSharedPreferences("preferences", MODE_PRIVATE);
         mContext = context;
         mHandler = handler;
+        enviarAvisoDeActualizacion(ESTADO_BLUETOOTH_INACTIVO);
     }
 
     String getDireccionMAC() {
@@ -67,6 +68,7 @@ public class AdministradorDeBluetooth {
     }
 
     void desconectar() {
+        enviarAvisoDeActualizacion(ESTADO_BLUETOOTH_INACTIVO);
         if (mThreadConectarBluetooth != null) {
             if (mThreadConectarBluetooth.isAlive()) {
                 mThreadConectarBluetooth.cancelar();
@@ -75,13 +77,14 @@ public class AdministradorDeBluetooth {
         if (mTrabajoThread != null) {
             if (/*mTrabajoThread.isAlive()*/ !mTrabajoThread.isCancelled()) {
 //                mTrabajoThread.cancelar();
-                mTrabajoThread.cancel(true);
+                mTrabajoThread.cancelar(true);
             }
         }
     }
 
 
     private void empezarLectura(BluetoothSocket mmSocket) {
+        Log.i(TAG, "empezarLectura: CAMBIO DE THREAD");
 //        mTrabajoThread = new ThreadTrabajoBluetooth(mmSocket);
 //        mTrabajoThread.start();
         mTrabajoThread = new TaskDeTrabajo(mmSocket);
@@ -99,6 +102,11 @@ public class AdministradorDeBluetooth {
     private void mensajeRecibido(byte[] buffer, int bytes) {
         Log.i(TAG, "mensajeRecibido: "+ Arrays.toString(buffer));
         ((SmartDomoticActivity) mContext).mensajeRecibido(buffer, bytes);
+    }
+
+    private void enviarAvisoDeActualizacion(String aviso ) {
+        Intent intent = new Intent(aviso);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     private class ThreadConectarBluetooth extends Thread {
@@ -295,6 +303,7 @@ public class AdministradorDeBluetooth {
             Log.i(TAG, "onProgressUpdate: "+ values);
         }
 
+
         /**
          * Escribir en el socket
          */
@@ -306,10 +315,15 @@ public class AdministradorDeBluetooth {
                 Log.d(TAG, "write: ", e);
             }
         }
-    }
 
-    private void enviarAvisoDeActualizacion(String aviso ) {
-        Intent intent = new Intent(aviso);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        public void cancelar(boolean b) {
+            Log.i(TAG, "cancelar: working......... CANCELED");
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            cancel(b);
+        }
     }
 }
