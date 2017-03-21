@@ -21,4 +21,5 @@ public class Sala1 extends SmartDomoticActivity {
     }
 
 
+
 }

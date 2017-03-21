@@ -4,17 +4,23 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static android.content.Context.MODE_PRIVATE;
+import static pruebas.app.wilfredorivera.com.smartdomotic.SmartDomoticActivity.ESTADO_BLUETOOTH_ACTIVO;
+import static pruebas.app.wilfredorivera.com.smartdomotic.SmartDomoticActivity.ESTADO_BLUETOOTH_INACTIVO;
 
 /**
  * Created by Neri Ortez on 15/03/2017.
@@ -30,8 +36,9 @@ public class AdministradorDeBluetooth {
     private BluetoothDevice mDevice;
     private SharedPreferences mPref;
     private ThreadConectarBluetooth mThreadConectarBluetooth;
-    private ThreadTrabajoBluetooth mTrabajoThread;
 
+//    private ThreadTrabajoBluetooth mTrabajoThread;
+    private TaskDeTrabajo mTrabajoThread;
 
     AdministradorDeBluetooth(Context context, Handler handler) {
         mPref = context.getSharedPreferences("preferences", MODE_PRIVATE);
@@ -66,23 +73,31 @@ public class AdministradorDeBluetooth {
             }
         }
         if (mTrabajoThread != null) {
-            if (mTrabajoThread.isAlive()) {
-                mTrabajoThread.cancelar();
+            if (/*mTrabajoThread.isAlive()*/ !mTrabajoThread.isCancelled()) {
+//                mTrabajoThread.cancelar();
+                mTrabajoThread.cancel(true);
             }
         }
     }
 
 
     private void empezarLectura(BluetoothSocket mmSocket) {
-        mTrabajoThread = new ThreadTrabajoBluetooth(mmSocket);
-        mTrabajoThread.start();
+//        mTrabajoThread = new ThreadTrabajoBluetooth(mmSocket);
+//        mTrabajoThread.start();
+        mTrabajoThread = new TaskDeTrabajo(mmSocket);
+        mTrabajoThread.execute();
     }
 
     private void guardarDispositivoBluetooth(String address) {
 //        mPref.edit().putString(DEVICE_ADDRESS_KEY, address).apply();
     }
 
+    private void mensajeRecibido(byte[] buffer){
+        mensajeRecibido(buffer, 1024);
+    }
+
     private void mensajeRecibido(byte[] buffer, int bytes) {
+        Log.i(TAG, "mensajeRecibido: "+ Arrays.toString(buffer));
         ((SmartDomoticActivity) mContext).mensajeRecibido(buffer, bytes);
     }
 
@@ -175,6 +190,7 @@ public class AdministradorDeBluetooth {
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
+
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     // Send the obtained bytes to the UI activity
@@ -211,5 +227,89 @@ public class AdministradorDeBluetooth {
                 Log.e(TAG, "Could not close the client socket", e);
             }
         }
+    }
+
+    private class TaskDeTrabajo extends AsyncTask<Void, String, Boolean>{
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
+
+        TaskDeTrabajo(BluetoothSocket socket) {
+            Log.d(TAG, "ThreadTrabajoBluetooth: Empezando Thread de Trabajo");
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+            mmSocket = socket;
+
+            // Get the input and output streams, using temp objects because
+            // member streams are final
+            try {
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) {
+            }
+
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            enviarAvisoDeActualizacion(ESTADO_BLUETOOTH_ACTIVO);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            Log.d(TAG, "run: working...................");
+            byte[] buffer = new byte[1024];  // buffer store for the stream
+            int bytes; // bytes returned from read()
+
+            // Keep listening to the InputStream until an exception occurs
+            while (true) {
+                try {
+                    if (isCancelled()) {
+                        return false;
+                    }
+                    // Read from the InputStream
+                    bytes = mmInStream.read(buffer);
+                    // Send the obtained bytes to the UI activity
+//                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+//                            .sendToTarget();
+                    publishProgress(Arrays.toString(buffer));
+//                    mensajeRecibido(buffer, bytes);
+                } catch (IOException e) {
+                    break;
+                }
+            }
+            return false;
+        }
+
+
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            enviarAvisoDeActualizacion(ESTADO_BLUETOOTH_INACTIVO);
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            Log.i(TAG, "onProgressUpdate: "+ values);
+        }
+
+        /**
+         * Escribir en el socket
+         */
+        public void write(byte[] bytes) {
+            try {
+                mmOutStream.write(bytes);
+            } catch (IOException e) {
+                Toast.makeText(mContext, "Error en la comunicacion: ENVIO", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "write: ", e);
+            }
+        }
+    }
+
+    private void enviarAvisoDeActualizacion(String aviso ) {
+        Intent intent = new Intent(aviso);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 }

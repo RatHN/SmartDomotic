@@ -16,6 +16,9 @@ import android.widget.Toast;
 abstract class SmartDomoticActivity extends AppCompatActivity {
     static final int activa_bluetooth = 1;
     static final int activa_conexion = 2;
+    static final String ESTADO_CAMBIO = "ESTADO_CAMBIO";
+    static final String ESTADO_BLUETOOTH_ACTIVO = "activo";
+    static final String ESTADO_BLUETOOTH_INACTIVO = "inactivo";
 
     AdministradorDeBluetooth mAdministradorBluetooth;
     BluetoothAdapter miBluetoothAdapter = null;
@@ -33,6 +36,8 @@ abstract class SmartDomoticActivity extends AppCompatActivity {
             Intent activarBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(activarBtIntent, activa_bluetooth);
         }
+
+
     }
 
     @Override
@@ -79,6 +84,7 @@ abstract class SmartDomoticActivity extends AppCompatActivity {
                 break;
         }
     }
+
 
     abstract void mensajeRecibido(byte[] buffer, int bytes);
 

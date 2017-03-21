@@ -22,4 +22,5 @@ public class Bano extends SmartDomoticActivity {
     void mensajeRecibido(byte[] buffer, int bytes) {
 
     }
+
 }

@@ -1,11 +1,16 @@
 package pruebas.app.wilfredorivera.com.smartdomotic;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 
 public class MainActivity extends SmartDomoticActivity {
 
@@ -13,6 +18,7 @@ public class MainActivity extends SmartDomoticActivity {
     private final String PUERTA_MENSAJE = "PUERTA";
     private final String CORREDOR_MENSAJE = "CORREDOR";
     Button dormitorio1, dormitorio2, Sala, bano, btconectar;
+    TextView estado;
     Switch puerta, corredorL;
     boolean conexion = false;
 
@@ -21,6 +27,8 @@ public class MainActivity extends SmartDomoticActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        estado = ((TextView) findViewById(R.id.estadoTxt));
 
         //Interruptores secundarios
         puerta = (Switch) findViewById(R.id.puerta);
@@ -103,11 +111,39 @@ public class MainActivity extends SmartDomoticActivity {
                 mAdministradorBluetooth.escribir(data);
             }
         });
+
+        IntentFilter mStatusIntentFilter = new IntentFilter(ESTADO_CAMBIO);
+        BluetoothBradcastReceiver broadcastReceiver = new BluetoothBradcastReceiver();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, mStatusIntentFilter);
     }
 
+
+    void estadoBluetooth(boolean listo) {
+        if (listo) {
+            estado.setText("Estado: Listo");
+        } else {
+            estado.setText("Esperando Conexión");
+        }
+    }
 
     @Override
     void mensajeRecibido(byte[] buffer, int bytes) {
 
+    }
+
+    class BluetoothBradcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ESTADO_BLUETOOTH_ACTIVO:
+                    estadoBluetooth(true);
+                    break;
+                case ESTADO_BLUETOOTH_INACTIVO:
+                    estadoBluetooth(false);
+                    break;
+            }
+        }
     }
 }

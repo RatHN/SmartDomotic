@@ -17,4 +17,5 @@ public class Dormitorio2 extends SmartDomoticActivity {
     void mensajeRecibido(byte[] buffer, int bytes) {
 
     }
+
 }
