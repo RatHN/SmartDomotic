@@ -60,11 +60,15 @@ public class AdministradorDeBluetooth {
     }
 
     void desconectar() {
-        if (mThreadConectarBluetooth.isAlive()) {
-            mThreadConectarBluetooth.cancelar();
+        if (mThreadConectarBluetooth != null) {
+            if (mThreadConectarBluetooth.isAlive()) {
+                mThreadConectarBluetooth.cancelar();
+            }
         }
-        if (mTrabajoThread.isAlive()) {
-            mTrabajoThread.cancelar();
+        if (mTrabajoThread != null) {
+            if (mTrabajoThread.isAlive()) {
+                mTrabajoThread.cancelar();
+            }
         }
     }
 
@@ -75,7 +79,7 @@ public class AdministradorDeBluetooth {
     }
 
     private void guardarDispositivoBluetooth(String address) {
-        mPref.edit().putString(DEVICE_ADDRESS_KEY, address).apply();
+//        mPref.edit().putString(DEVICE_ADDRESS_KEY, address).apply();
     }
 
     private void mensajeRecibido(byte[] buffer, int bytes) {
@@ -89,6 +93,7 @@ public class AdministradorDeBluetooth {
         ThreadConectarBluetooth(BluetoothDevice device) {
             // Use a temporary object that is later assigned to mmSocket
             // because mmSocket is final.
+            Log.d(TAG, "ThreadConectarBluetooth: Conectando con Dispositivo para trabajar");
             BluetoothSocket tmp = null;
             mmDevice = device;
             try {
@@ -104,7 +109,7 @@ public class AdministradorDeBluetooth {
         public void run() {
             // Cancel discovery because it otherwise slows down the connection.
             BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-
+            Log.d(TAG, "run: Getting connected to work");
             try {
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
@@ -129,6 +134,7 @@ public class AdministradorDeBluetooth {
          * Cerrar toda conexión y liberar recursos
          */
         void cancelar() {
+            Log.d(TAG, "cancelar: Stopping Connecting Thread");
             try {
                 mmSocket.close();
             } catch (IOException e) {
@@ -144,6 +150,7 @@ public class AdministradorDeBluetooth {
         private BluetoothSocket mmSocket;
 
         ThreadTrabajoBluetooth(BluetoothSocket socket) {
+            Log.d(TAG, "ThreadTrabajoBluetooth: Empezando Thread de Trabajo");
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
             mmSocket = socket;
@@ -161,6 +168,7 @@ public class AdministradorDeBluetooth {
         }
 
         public void run() {
+            Log.d(TAG, "run: working...................");
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
@@ -188,6 +196,7 @@ public class AdministradorDeBluetooth {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 Toast.makeText(mContext, "Error en la comunicacion: ENVIO", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "write: ", e);
             }
         }
 
@@ -195,6 +204,7 @@ public class AdministradorDeBluetooth {
          * Cerrar toda conexión y liberar recursos
          */
         void cancelar() {
+            Log.d(TAG, "cancelar: Stopping Working Thread");
             try {
                 mmSocket.close();
             } catch (IOException e) {

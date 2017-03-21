@@ -44,9 +44,13 @@ abstract class SmartDomoticActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        String direccionMAC = mAdministradorBluetooth.getDireccionMAC();
+        if (direccionMAC.equals("null")) {
+            return;
+        }
         mAdministradorBluetooth.conectar(                               //Enlazamos el administrador del Bluetooth
                 miBluetoothAdapter.getRemoteDevice(                     //Con el dispositivo
-                        mAdministradorBluetooth.getDireccionMAC()));    //Que se guardó en memoria
+                        direccionMAC));    //Que se guardó en memoria
 
     }
 

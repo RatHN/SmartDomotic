@@ -85,8 +85,8 @@ public class MainActivity extends SmartDomoticActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 byte[] data;
-                if (b) data = "PUERTA:1".getBytes();
-                else data = "PUERTA:0".getBytes();
+                if (b) data = "PUERTA:1\n".getBytes();
+                else data = "PUERTA:0\n".getBytes();
 
                 mAdministradorBluetooth.escribir(data);
 
@@ -97,8 +97,8 @@ public class MainActivity extends SmartDomoticActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 byte[] data;
-                if (b) data = "CORREDOR:1".getBytes();
-                else data = "CORREDOR:0".getBytes();
+                if (b) data = "CORREDOR:1\n".getBytes();
+                else data = "CORREDOR:0\n".getBytes();
 
                 mAdministradorBluetooth.escribir(data);
             }
