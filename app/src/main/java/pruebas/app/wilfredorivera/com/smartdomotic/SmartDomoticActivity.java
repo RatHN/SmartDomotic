@@ -1,10 +1,14 @@
 package pruebas.app.wilfredorivera.com.smartdomotic;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
@@ -37,7 +41,11 @@ abstract class SmartDomoticActivity extends AppCompatActivity {
             startActivityForResult(activarBtIntent, activa_bluetooth);
         }
 
+        IntentFilter mStatusIntentFilter = new IntentFilter(ESTADO_BLUETOOTH_ACTIVO);
+        mStatusIntentFilter.addAction(ESTADO_BLUETOOTH_INACTIVO);
+        BluetoothBradcastReceiver broadcastReceiver = new BluetoothBradcastReceiver();
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, mStatusIntentFilter);
     }
 
     @Override
@@ -88,4 +96,20 @@ abstract class SmartDomoticActivity extends AppCompatActivity {
 
     abstract void mensajeRecibido(byte[] buffer, int bytes);
 
+    abstract void estadoBluetooth(boolean estado);
+
+    class BluetoothBradcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ESTADO_BLUETOOTH_ACTIVO:
+                    estadoBluetooth(true);
+                    break;
+                case ESTADO_BLUETOOTH_INACTIVO:
+                    estadoBluetooth(false);
+                    break;
+            }
+        }
+
+    }
 }

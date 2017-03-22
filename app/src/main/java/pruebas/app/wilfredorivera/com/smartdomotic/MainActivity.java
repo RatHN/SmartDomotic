@@ -1,11 +1,7 @@
 package pruebas.app.wilfredorivera.com.smartdomotic;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -111,12 +107,6 @@ public class MainActivity extends SmartDomoticActivity {
                 mAdministradorBluetooth.escribir(data);
             }
         });
-
-        IntentFilter mStatusIntentFilter = new IntentFilter(ESTADO_BLUETOOTH_ACTIVO);
-        mStatusIntentFilter.addAction(ESTADO_BLUETOOTH_INACTIVO);
-        BluetoothBradcastReceiver broadcastReceiver = new BluetoothBradcastReceiver();
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, mStatusIntentFilter);
     }
 
 
@@ -133,18 +123,5 @@ public class MainActivity extends SmartDomoticActivity {
 
     }
 
-    class BluetoothBradcastReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case ESTADO_BLUETOOTH_ACTIVO:
-                    estadoBluetooth(true);
-                    break;
-                case ESTADO_BLUETOOTH_INACTIVO:
-                    estadoBluetooth(false);
-                    break;
-            }
-        }
-    }
 }
