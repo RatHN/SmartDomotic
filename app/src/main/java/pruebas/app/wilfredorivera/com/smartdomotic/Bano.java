@@ -9,8 +9,8 @@ public class Bano extends SmartDomoticActivity {
 
     final String LUZ = "LUZB";
     final String TOMA = "TOMAB";
-    final String ON = "1\n";
-    final String OFF = "0\n";
+    final String ON = ":1\n";
+    final String OFF = ":0\n";
 
     Switch lb, tcb;
     private TextView estado;

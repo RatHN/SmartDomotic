@@ -7,8 +7,8 @@ import android.widget.TextView;
 
 public class Dormitorio1 extends SmartDomoticActivity {
 
-    private static final String OFF = "0\n";
-    private static final String ON = "1\n";
+    private static final String OFF = ":0\n";
+    private static final String ON = ":1\n";
     private static final String TOMA = "TOMAD1";
     private static final String LUZ = "LUZD1";
     private static final String VENT = "VENTD1";
